@@ -7,14 +7,14 @@ import re
 def create_db():
  print "Creating entries db"
  try:
-  entries = Base('entries.db').create(('name',str),('value',float),('timestamp',datetime))
-  categories = Base('categories.db').create(('name',str))
-  entry_cats = Base('entry_categories.db').create(('entry',entries),('category',categories))
+  entries = Base('data/entries.db').create(('name',str),('value',float),('timestamp',datetime))
+  categories = Base('data/categories.db').create(('name',str))
+  entry_cats = Base('data/entry_categories.db').create(('entry',entries),('category',categories))
  except(IOError):
   print ""  
 
 def parse_input(input):
- entries = Base('entries.db').open()
+ entries = Base('data/entries.db').open()
 
  print 'parsing ' + input
 
@@ -25,7 +25,7 @@ def parse_input(input):
   print 'Matched ? at ?'
   print m.group(1)
   print m.group(2)
-  ts = new datetime.today()
+  ts = datetime.today()
   entries.insert(name=input,timestamp=ts)
 
  else:
@@ -43,16 +43,16 @@ def ask_for_metric():
    parse_input(response) 
 
 def show_items():
- entries = Base('entries.db').open()
+ entries = Base('data/entries.db').open()
  ar_entries = entries.select()
  for entry in ar_entries:
   print entry.name  +":"+ entry.timestamp.strftime("%A %d. %b %Y %H:%M")
 
 # check if we have a metrics database first
 create_db()	
-entries = Base('entries.db').open()
-categories = Base('categories.db').open()
-entry_cats = Base('entry_categories.db').open()
+entries = Base('data/entries.db').open()
+categories = Base('data/categories.db').open()
+entry_cats = Base('data/entry_categories.db').open()
 
 ask_for_metric()
 
