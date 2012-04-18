@@ -5,6 +5,9 @@ import os
 class Parser:
  tokens = ()
  precedence = ()
+ yparser = None
+ fields = []
+ values = []
 
  def __init__(self, **kw):
   self.debug = kw.get('debug',1)
@@ -17,11 +20,20 @@ class Parser:
   self.debugfile = modname + ".dbg"
   self.tabmodule = modname + "_" + "parsetab"
   lex.lex(module=self, debug=self.debug)
-  yacc.yacc(module=self,
+  self.yparser = yacc.yacc(module=self,
             debug=self.debug,
             debugfile=self.debugfile,
             tabmodule=self.tabmodule)
 
+ def parse(self,data,debug=0):
+  self.yparser.error = 0
+  self.fields = []
+  self.values = []
+  p = self.yparser.parse(data,debug=debug)
+  if self.yparser.error: 
+   return None
+  return p
+  
  def run(self):
   while 1:
    try:
@@ -29,7 +41,7 @@ class Parser:
    except EOFError:
     break
    if not s: continue
-   yacc.parse(s)
+   print "< {}".format(self.parse(s))
 
 
 

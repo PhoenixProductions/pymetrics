@@ -1,6 +1,7 @@
 from parser import Parser
 
 class MetricsParser(Parser):
+
  tokens = (
   'WORD', 'AT', 'NUMBER', 'FLOAT', 'COLON', 'SPACE'
  )
@@ -22,34 +23,63 @@ class MetricsParser(Parser):
   t.lexer.skip(1)
 
  def p_command(self,p):
-  """ command : action
-              | action time
+  """ command : unit
+              | unit time
   """
-  lp = len(p)
+  if len(p) == 1:
+   p[0] = "INSERT INTO units {} VALUES {}".format(self.fields,self.values)
+  elif len(p) == 2:
+   self.fields.append('timestamp')
+   self.values.append('now')
+  
+   p[0] = "INSERT INTO units {} VALUES {}".format(self.fields,self.values)
 
 
  def p_time(self,p):
   """ time : AT NUMBER 
   """
   print "Matched time"
+  self.fields.append('timestamp')
+  self.values.append(p[2])
   
- def p_action(self,p):
-  """action  : simpleaction
-             | actionwithcategory
+ def p_unit(self,p):
+  """unit  : simpleunit
+           | unitwithcategory
   """
-  print "Matched action {}".format(len(p))
+ # p[0] = p[1]
 
- def p_simpleaction(self,p):
-  """simpleaction : WORD
+ def p_simpleunit(self,p):
+  """simpleunit : WORD
+                | WORD NUMBER
   """
-  print "Simple action {}".format(len(p))
+  print "Simple unit {} i.e. 1 of".format(len(p))
+  self.fields.append('item')
+  self.values.append(p[1])
+  if len(p) == 3:
+   self.fields.append('count')
+   self.values.append(p[2])
+  else:
+   self.fields.append('count')
+   self.values.append(1)
 
- def p_actionwithcategory(self,p):
-  """actionwithcategory : WORD WORD
+ def p_unitwithcategory(self,p):
+  """unitwithcategory : WORD WORD
+                      | WORD NUMBER WORD
   """
-  print "Matched actionwith category {}".format(len(p))
-
- 
+  print "Matched unit with category {}".format(len(p))
+  self.fields.append('item')  
+  self.values.append(p[1])
+  if len(p) == 3:
+   self.fields.append('count')
+   self.values.append(p[2])
+   self.fields.append('unit')
+   self.values.append(1)
+  if len(p) == 4:
+   self.fields.append('count')
+   self.values.append(p[2])
+   self.fields.append('unit')
+   self.values.append(p[3])
+   
  def p_error(self,p):
   if p:
    print "parse error %s" % p.value
