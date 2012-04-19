@@ -5,7 +5,7 @@ import re
 
  
 def create_db():
- print "Creating entries db"
+ print("Creating entries db")
  try:
   entries = Base('data/entries.db').create(('name',str),('value',float),('timestamp',datetime))
   categories = Base('data/categories.db').create(('name',str))
@@ -16,15 +16,15 @@ def create_db():
 def parse_input(input):
  entries = Base('data/entries.db').open()
 
- print 'parsing ' + input
+ print ('parsing {}'.format(input))
 
  #search for <name> at <time>
  re_at_time = re.compile('(.+) at ([0-9:]+)', re.IGNORECASE)
  m = re_at_time.match(input)
  if (m):
-  print 'Matched ? at ?'
-  print m.group(1)
-  print m.group(2)
+  print ('Matched ? at ?')
+  print (m.group(1))
+  print( m.group(2))
   ts = datetime.today()
   entries.insert(name=input,timestamp=ts)
 
@@ -35,7 +35,7 @@ def ask_for_metric():
  while True:
   response = raw_input('>')
   if response in ('!q','!quit'):
-   print 'quitting'
+   print('quitting')
    return
   if response in('!l','!list'):
    show_items()
