@@ -49,7 +49,7 @@ class MetricsParser():
             pass                    
                          
  tokens = (
-  'WORD', 'AT', 'NUMBER', 'CMD'
+  'WORD', 'AT', 'NUMBER'
  )
 
 # t_FLOAT   = r'((\d*\.\d+)(E[\+-]?\d+)?|([1-9]\d*E[\+-]?\d+))'
@@ -57,7 +57,7 @@ class MetricsParser():
  t_NUMBER = r'\d+'
  t_WORD = r'[a-zA-Z_]+'
  t_AT = r'@'
- t_CMD = r'![a-zA-Z]+'
+ #t_CMD = r'![a-zA-Z]+'
  def t_newline(self,t):
   r'\n+'
 
@@ -102,22 +102,11 @@ class MetricsParser():
         
     
  def p_unit(self,p):
-  """unit  : CMD
-           | simpleunit
+  """unit  : simpleunit
            | unitwithcategory
   """
-  if len(p) == 2:
-        self.write = 0
-        p[0] = 'Command'
-        print('Command Detected')
-        if p[1] == '!l':
-            with open('data','r') as f:
-                for line in f:
-                    print("{}".format(line))
-                f.close()
-      
-  else:
-          p[0] = p[1]
+
+  p[0] = p[1]
 
  def p_simpleunit(self,p):
   """simpleunit : WORD
