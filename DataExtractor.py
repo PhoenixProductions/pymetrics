@@ -8,9 +8,9 @@ import fileinput
 class DataExtractor:
   
   
-  def __init__(self, file):
+  def __init__(self, file, out):
     self.datafile = file
-    self.analysisdir = 'analysis'
+    self.analysisdir = os.path.expanduser(out)
       
   def run(self): 
     
@@ -43,7 +43,7 @@ class DataExtractor:
       #num_count = components[3]
       #str_unit = components[4]
       #check if an "action" file exists in the analysis dir
-      with open('analysis/{}.log'.format(str_action),'a') as f:
+      with open('{}/{}.log'.format(self.analysisdir, str_action),'a') as f:
         f.write("{}\n".format(dataline))
         f.close()
     #finished extracting the data file
@@ -55,7 +55,10 @@ class DataExtractor:
 if __name__ == '__main__':
   parser = argparse.ArgumentParser(description="Params")
   parser.add_argument('datafile', nargs='?', help='DataFile to be processed')
+  parser.add_argument('out',nargs='?',default='~/Dropbox/metrics/analysis',help='Location for analysis files')
   args = parser.parse_args()
-  
-  de = DataExtractor(args.datafile)
-  de.run()
+  if args.datafile == None:
+    parser.print_help()
+  else:  
+   de = DataExtractor(args.datafile, args.out)
+   de.run()
