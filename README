@@ -1,0 +1,8 @@
+This is a simple set of python scripts to allow for 
+(simplified) natural language entry of personal metrics for 
+analysis (see Stephen Wolfram's article for origin idea).
+
+It is split into 3 parts:
+* a raw data collector (metricsparser.py)
+* a pre-parser which collates activities into "item" logs
+* an analyser which will produce some outputs from the data.
