@@ -1,3 +1,4 @@
+import configparser
 import time
 import os
 import datetime
@@ -11,15 +12,18 @@ class DataExtractor:
   def __init__(self, file, out, archive=False):
     self.datafile = file
     self.analysisdir = os.path.expanduser(out)
+    self.archive = archive
       
   def run(self): 
-    
+    if not os.path.exists(self.analysisdir):
+        print(": Analysis directory {} doesn't exist".format(self.analysisdir))
+        return
     print(': Starting extraction')
     if (self.datafile ==''):
       print('No file specified')
       return
     workingfilename ="{}_working".format(self.datafile)
-    archive_data_filename = "{}_{}.log".format(self.datafile,datetime.datetime.now().strftime('%Y%m%d%H%M%S'))
+    archive_data_filename = "{}.log".format(os.path.join(self.datafile,datetime.datetime.now().strftime('%Y%m%d%H%M%S')))
     print("{}".format(self.datafile))
     print(": copying to working file to {}".format(workingfilename) )
     try:
@@ -42,19 +46,19 @@ class DataExtractor:
         #str_unit = components[4]
         #check if an "action" file exists in the analysis dir
         
-        str_outputfile = '{}/{}.log'.format(self.analysisdir, str_action)
+        str_outputfile = '{}.log'.format(os.path.join(self.analysisdir, str_action))
+        print("Writing data to {}".format(str_outputfile))
         try:
-            with open(str_outputfile,'a+') as f:
+            with open(str_outputfile,'a') as f:
                 f.write("{}\n".format(dataline))
                 f.close()
         except IOError as e:
-            with open(str_outputfile,'w') as f:
-                f.write("{}\n".format(dataline))
-                f.close()
+            print("unable to write to log file")
+            self.archive = False #skip the archiving step.
         #finished extracting the data file
         #delete it    
 
-    if archive is True:
+    if self.archive is True:
         print(": archiving to{}".format(archive_data_filename))
         os.rename(self.datafile,archive_data_filename)
         os.remove(workingfilename)
@@ -62,14 +66,18 @@ class DataExtractor:
     
         
 if __name__ == '__main__':
-  parser = argparse.ArgumentParser(description="Params")
-  parser.add_argument('-n','--noarchive',nargs='?',default=False,help='Skip archiving data', const=False)
-  parser.add_argument('datafile', nargs='?', help='DataFile to be processed')
-  parser.add_argument('-o', '--out',nargs='?',default='analysis/',help='Location for analysis files')
-
-  args = parser.parse_args()
-  if args.datafile == None:
-    parser.print_help()
-  else:  
-   de = DataExtractor(args.datafile, args.out, args.noarchive)
-   de.run()
+    #load configuration 1st
+    config = configparser.ConfigParser()
+    config.read('config')
+    
+    parser = argparse.ArgumentParser(description="Params")
+    #parser.add_argument('-n','--noarchive',nargs='?',default=config['DEFAULT']['ArchiveDataLog'],help='Skip archiving data', const=False)
+    parser.add_argument('datafile', nargs='?', help='DataFile to be processed')
+    parser.add_argument('-o', '--out',nargs='?',default=config['DEFAULT']['AnalysisLogs'],help='Location for analysis files')
+    
+    args = parser.parse_args()
+    if args.datafile == None:
+        parser.print_help()
+    else:  
+        de = DataExtractor(args.datafile, args.out, config['DEFAULT']['ArchiveDataLog'])
+        de.run()

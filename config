@@ -1,0 +1,10 @@
+[DEFAULT]
+DataLog = data
+AnalysisLogs = analysis/
+ArchiveDataLog = False
+
+[DEBUG]
+DataLog = data
+AnalysisLogs = ./
+ArchiveDataLog = true
+
