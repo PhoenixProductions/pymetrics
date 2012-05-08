@@ -23,7 +23,7 @@ class DataExtractor:
       print('No file specified')
       return
     workingfilename ="{}_working".format(self.datafile)
-    archive_data_filename = "{}.log".format(os.path.join(self.datafile,datetime.datetime.now().strftime('%Y%m%d%H%M%S')))
+    archive_data_filename = "archive_{}.log".format(datetime.datetime.now().strftime('%Y%m%d%H%M%S'))
     print("{}".format(self.datafile))
     print(": copying to working file to {}".format(workingfilename) )
     try:
@@ -57,8 +57,8 @@ class DataExtractor:
             self.archive = False #skip the archiving step.
         #finished extracting the data file
         #delete it    
-
-    if self.archive is True:
+    print("{}".format(self.archive))    
+    if self.archive:
         print(": archiving to{}".format(archive_data_filename))
         os.rename(self.datafile,archive_data_filename)
         os.remove(workingfilename)
@@ -74,7 +74,7 @@ if __name__ == '__main__':
     #parser.add_argument('-n','--noarchive',nargs='?',default=config['DEFAULT']['ArchiveDataLog'],help='Skip archiving data', const=False)
     parser.add_argument('datafile', nargs='?', help='DataFile to be processed')
     parser.add_argument('-o', '--out',nargs='?',default=config['DEFAULT']['AnalysisLogs'],help='Location for analysis files')
-    
+    print("{}".format(config['DEFAULT']['ArchiveDataLog']))    
     args = parser.parse_args()
     if args.datafile == None:
         parser.print_help()
